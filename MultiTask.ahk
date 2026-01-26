@@ -1,3 +1,5 @@
+; This script binds open "program" to "button", automatically creates and pastest timestamps on keybind and gives the option to plain paste (settings / configuration for this script can be adjusted under cfg.hk and paths for programs under cfg.paths)
+
 #Requires AutoHotkey v2.0
 #SingleInstance Force
 #Warn
@@ -54,3 +56,4 @@ Launch(path, fallbackExe) {
         TrayTip("Launch failed: " (path ? path : fallbackExe))
     }
 }
+
