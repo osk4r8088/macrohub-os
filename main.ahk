@@ -11,30 +11,32 @@ global CFG_PATH := A_ScriptDir "\config.ini"
 #Include %A_ScriptDir%\modules\copypaste\module.ahk
 #Include %A_ScriptDir%\modules\stringpaste\module.ahk
 
-; Track init state so we can enable/disable at runtime
+; Track module states for tray checkmarks
 global g_Modules := Map(
-    "autoclick",  { on: false },
-    "multitask",  { on: false },
-    "copypaste",  { on: false },
-    "stringpaste",{ on: false }
+    "autoclick",   { on: false },
+    "multitask",   { on: false },
+    "copypaste",   { on: false },
+    "stringpaste", { on: false }
 )
 
 InitAll()
 
 InitAll() {
+    global CFG_PATH
+
     if !FileExist(CFG_PATH) {
         MsgBox "Missing config.ini: " CFG_PATH
         ExitApp
     }
 
-    ; Initialize modules once (they register hotkeys but we can turn them on/off)
+    ; Init modules (they should register hotkeys OFF initially)
     AutoClick_Init(CFG_PATH)
     MultiTask_Init(CFG_PATH)
     CopyPaste_Init(CFG_PATH)
     StringPaste_Init(CFG_PATH)
 
-    ; Apply enabled flags from config
-    Module_SetEnabled("autoclick",   IniRead(CFG_PATH, "Modules", "autoclick", "1") = "1")
+    ; Apply enabled flags from config.ini
+    Module_SetEnabled("autoclick",   IniRead(CFG_PATH, "Modules", "autoclick", "0") = "1")
     Module_SetEnabled("multitask",   IniRead(CFG_PATH, "Modules", "multitask", "1") = "1")
     Module_SetEnabled("copypaste",   IniRead(CFG_PATH, "Modules", "copypaste", "1") = "1")
     Module_SetEnabled("stringpaste", IniRead(CFG_PATH, "Modules", "stringpaste", "1") = "1")
@@ -46,7 +48,7 @@ Module_SetEnabled(name, enable) {
     global g_Modules, CFG_PATH
     g_Modules[name].on := !!enable
 
-    ; Call module-specific enable/disable hooks
+    ; call module toggle hooks
     switch name {
         case "autoclick":   AutoClick_SetEnabled(enable)
         case "multitask":   MultiTask_SetEnabled(enable)
@@ -54,10 +56,10 @@ Module_SetEnabled(name, enable) {
         case "stringpaste": StringPaste_SetEnabled(enable)
     }
 
-    ; Persist to config.ini
+    ; persist
     IniWrite(enable ? "1" : "0", CFG_PATH, "Modules", name)
 
-    ; Refresh tray checkmarks
+    ; refresh tray checkmarks
     TraySetup()
 }
 
@@ -72,7 +74,6 @@ TraySetup() {
     modMenu.Add("CopyPaste",   (*) => Module_SetEnabled("copypaste",   !g_Modules["copypaste"].on))
     modMenu.Add("StringPaste", (*) => Module_SetEnabled("stringpaste", !g_Modules["stringpaste"].on))
 
-    ; checkmarks
     if (g_Modules["autoclick"].on)   modMenu.Check("AutoClick")
     if (g_Modules["multitask"].on)   modMenu.Check("MultiTask")
     if (g_Modules["copypaste"].on)   modMenu.Check("CopyPaste")
