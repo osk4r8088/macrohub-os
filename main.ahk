@@ -4,19 +4,18 @@
 SetWorkingDir A_ScriptDir
 
 global CFG_PATH := A_ScriptDir "\config.ini"
+A_IconTip := "workflow-optimization_ahk (MAIN)"
 
-; --- include modules ---
 #Include %A_ScriptDir%\modules\autoclick\module.ahk
 #Include %A_ScriptDir%\modules\multitask\module.ahk
 #Include %A_ScriptDir%\modules\copypaste\module.ahk
 #Include %A_ScriptDir%\modules\stringpaste\module.ahk
 
-; Track module states for tray checkmarks
 global g_Modules := Map(
-    "autoclick",   { on: false },
-    "multitask",   { on: false },
-    "copypaste",   { on: false },
-    "stringpaste", { on: false }
+    "autoclick",   false,
+    "multitask",   false,
+    "copypaste",   false,
+    "stringpaste", false
 )
 
 global g_ModMenu := Menu()
@@ -31,13 +30,13 @@ InitAll() {
         ExitApp
     }
 
-    ; Init modules (they should register hotkeys OFF initially)
-    AutoClick_Init(CFG_PATH)
-    MultiTask_Init(CFG_PATH)
-    CopyPaste_Init(CFG_PATH)
-    StringPaste_Init(CFG_PATH)
+    ; init modules (they should register hotkeys Off initially)
+    TryCall("AutoClick_Init", CFG_PATH)
+    TryCall("MultiTask_Init", CFG_PATH)
+    TryCall("CopyPaste_Init", CFG_PATH)
+    TryCall("StringPaste_Init", CFG_PATH)
 
-    ; Apply enabled flags from config.ini
+    ; read enabled flags (autoclick default OFF)
     Module_SetEnabled("autoclick",   IniRead(CFG_PATH, "Modules", "autoclick", "0") = "1")
     Module_SetEnabled("multitask",   IniRead(CFG_PATH, "Modules", "multitask", "1") = "1")
     Module_SetEnabled("copypaste",   IniRead(CFG_PATH, "Modules", "copypaste", "1") = "1")
@@ -46,23 +45,41 @@ InitAll() {
     TraySetup()
 }
 
+TryCall(fnName, param := "") {
+    ; Calls a function if it exists; never crashes the whole script.
+    try {
+        f := Func(fnName)
+        if (param = "")
+            f.Call()
+        else
+            f.Call(param)
+    } catch {
+        ; ignore missing or failing module init
+    }
+}
+
 Module_SetEnabled(name, enable) {
     global g_Modules, CFG_PATH
-    g_Modules[name].on := !!enable
+    g_Modules[name] := !!enable
 
-    ; call module toggle hooks
+    ; call module toggle hooks only if they exist
     switch name {
-        case "autoclick":   AutoClick_SetEnabled(enable)
-        case "multitask":   MultiTask_SetEnabled(enable)
-        case "copypaste":   CopyPaste_SetEnabled(enable)
-        case "stringpaste": StringPaste_SetEnabled(enable)
+        case "autoclick":   TryCall("AutoClick_SetEnabled", enable)
+        case "multitask":   TryCall("MultiTask_SetEnabled", enable)
+        case "copypaste":   TryCall("CopyPaste_SetEnabled", enable)
+        case "stringpaste": TryCall("StringPaste_SetEnabled", enable)
     }
 
-    ; persist
     IniWrite(enable ? "1" : "0", CFG_PATH, "Modules", name)
-
-    ; refresh tray checkmarks
     TraySetup()
+}
+
+TryCall(fnName, param) {
+    try {
+        Func(fnName).Call(param)
+    } catch {
+        ; ignore
+    }
 }
 
 TraySetup() {
@@ -70,17 +87,19 @@ TraySetup() {
 
     A_TrayMenu.Delete()
 
-    ; rebuild the submenu (global, so it cannot disappear)
-    g_ModMenu.Delete()
-    g_ModMenu.Add("AutoClick",   (*) => Module_SetEnabled("autoclick",   !g_Modules["autoclick"].on))
-    g_ModMenu.Add("MultiTask",   (*) => Module_SetEnabled("multitask",   !g_Modules["multitask"].on))
-    g_ModMenu.Add("CopyPaste",   (*) => Module_SetEnabled("copypaste",   !g_Modules["copypaste"].on))
-    g_ModMenu.Add("StringPaste", (*) => Module_SetEnabled("stringpaste", !g_Modules["stringpaste"].on))
+    ; Debug proves you're running the correct file
+    A_TrayMenu.Add("Debug: show script path", (*) => MsgBox(A_ScriptFullPath))
 
-    if (g_Modules["autoclick"].on)   g_ModMenu.Check("AutoClick")
-    if (g_Modules["multitask"].on)   g_ModMenu.Check("MultiTask")
-    if (g_Modules["copypaste"].on)   g_ModMenu.Check("CopyPaste")
-    if (g_Modules["stringpaste"].on) g_ModMenu.Check("StringPaste")
+    g_ModMenu.Delete()
+    g_ModMenu.Add("AutoClick",   (*) => Module_SetEnabled("autoclick",   !g_Modules["autoclick"]))
+    g_ModMenu.Add("MultiTask",   (*) => Module_SetEnabled("multitask",   !g_Modules["multitask"]))
+    g_ModMenu.Add("CopyPaste",   (*) => Module_SetEnabled("copypaste",   !g_Modules["copypaste"]))
+    g_ModMenu.Add("StringPaste", (*) => Module_SetEnabled("stringpaste", !g_Modules["stringpaste"]))
+
+    if (g_Modules["autoclick"])   g_ModMenu.Check("AutoClick")
+    if (g_Modules["multitask"])   g_ModMenu.Check("MultiTask")
+    if (g_Modules["copypaste"])   g_ModMenu.Check("CopyPaste")
+    if (g_Modules["stringpaste"]) g_ModMenu.Check("StringPaste")
 
     A_TrayMenu.Add("Modules", g_ModMenu)
     A_TrayMenu.Add()
@@ -89,4 +108,3 @@ TraySetup() {
     A_TrayMenu.Add("Reload", (*) => Reload())
     A_TrayMenu.Add("Exit", (*) => ExitApp())
 }
-
