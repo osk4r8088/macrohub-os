@@ -199,4 +199,4 @@ These workarounds are already applied. The script is fully compatible with both 
 
 ## License
 
-MIT
+MIT (= Do whatever you want with it, just credit the author when republishing or making additions)
