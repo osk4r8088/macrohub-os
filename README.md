@@ -6,11 +6,14 @@ A modular workflow automation toolkit for Windows built with AutoHotkey v2. Each
 - Human-friendly settings UI: small GUI for toggles + keybinds + text lists (no INI editing required).
 - “Safe Defaults” profile: a preset that avoids common conflicts (e.g., MediaKeys vs MultiTask numpad) and uses conservative hotkeys.
 - One-click restore: “Reset to defaults” + “Backup/Restore config” from tray.
-- Module manifest standard: each module provides metadata (name, description, defaults, hotkeys used, conflicts, settings schema).
+
 - Auto-register modules: main script discovers modules/*/module.ahk and reads manifest to build tray + settings UI automatically.
 - Per-module enable/disable without reload (where possible): hotkey enable/disable live; reload only when required.
-- Separate documentation: a short “Adding expansions & typo fixes” guide with examples + troubleshooting.
+
+- Module manifest standard: each module provides metadata (name, description, defaults, hotkeys used, conflicts, settings schema).
 - Central logging: optional log file (errors + key events) with “Open logs” in tray.
+
+- Separate documentation: a short “Adding expansions & typo fixes” guide with examples + troubleshooting.
 - Admin-friendly docs: “Deploy to a team” page: where config lives, how to lock settings, how to push updates
 - README stays high-level: what it does, how to run, how to toggle modules.
 - User Guide (separate): “Common tasks” with screenshots (tray menu, settings UI).
