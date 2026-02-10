@@ -1,7 +1,7 @@
 # MACROHUB-OS AHK Multiscript
 A modular workflow automation toolkit for Windows built with AutoHotkey v2. Each module can be toggled on/off from the system tray and all settings are persisted in `config.ini`.
 
-## Targets for future improvement
+## Targets for future improvement / goals
 - Conflict detection: warn if chosen hotkeys overlap (within and across modules) before applying.
 - Human-friendly settings UI: small GUI for toggles + keybinds + text lists (no INI editing required).
 - “Safe Defaults” profile: a preset that avoids common conflicts (e.g., MediaKeys vs MultiTask numpad) and uses conservative hotkeys.
@@ -214,7 +214,6 @@ That I ran into multiple stability issues so severe that I started vibecoding th
 - **`A_TrayMenu.Delete()` crashes the Store edition** — the tray menu is built once at startup instead of being rebuilt on each toggle. Checkmarks are updated in place.
 - **`Persistent` directive is required** — without it the script exits immediately since hotkeys start in the "Off" state and don't keep the script alive on their own
 - **The Store edition launcher can fail with certain file paths** — if you get a `launcher.ahk` error about `FileRead(ScriptPath)`, move the project to a simpler path like `C:\Users\<you>\Documents\`
-
 These workarounds are already applied. The script is fully compatible with both the Store and standard editions of AHK v2.
 
 ## License
