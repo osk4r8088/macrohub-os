@@ -2,10 +2,10 @@
 A modular workflow automation toolkit for Windows built with AutoHotkey v2. Each module can be toggled on/off from the system tray and all settings are persisted in `config.ini`.
 
 ## Targets for future improvement / goals
-- Conflict detection: warn if chosen hotkeys overlap (within and across modules) before applying.
-- Human-friendly settings UI: small GUI for toggles + keybinds + text lists (no INI editing required).
-- “Safe Defaults” profile: a preset that avoids common conflicts (e.g., MediaKeys vs MultiTask numpad) and uses conservative hotkeys.
-- One-click restore: “Reset to defaults” + “Backup/Restore config” from tray.
+- Conflict detection: warns if choosen hotkeys overlap before applying. (within and across modules)
+- easy accessibility settings UI: small GUI for toggles, keybinds, text lists. (no INI editing required)
+- “Safe Defaults” profile: a preset that avoids common conflicts and uses conservative hotkeys.
+- One-click restore: Reset to defaults + Backup/Restore config from tray.
 
 - Auto-register modules: main script discovers modules/*/module.ahk and reads manifest to build tray + settings UI automatically.
 - Per-module enable/disable without reload (where possible): hotkey enable/disable live; reload only when required.
