@@ -118,7 +118,7 @@ Add your own: `typo=correction` in the `[AutoReplace]` section.
 | Tray → Open config.ini | Edit configuration |
 | Tray → Reload | Reload script after config changes |
 
-A TrayTip notification appears when toggling modules.
+A TrayTip notification appears when toggling modules
 
 ## Configuration
 
